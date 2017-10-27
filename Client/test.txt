@@ -1,0 +1,2492 @@
+ 
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+CSC/ECE 573 Section 001
+Spring 2017
+Homework #3
+
+
+
+
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+CSC/ECE 573 Section 001
+Spring 2017
+Homework #3
+
+
+
+
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+CSC/ECE 573 Section 001
+Spring 2017
+Homework #3
+
+
+
+
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+CSC/ECE 573 Section 001
+Spring 2017
+Homework #3
+
+
+
+
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+CSC/ECE 573 Section 001
+Spring 2017
+Homework #3
+
+
+
+
+
+Keywords: TCP, Flow Control, Congestion Control, Slow Start, Congestion Window, Silly Window Syndrome (SWS).
+
+
+
+
+
+
+
+
+
+
+Name 1: __________________________Student ID 1: _______________________
+Name 2: __________________________Student ID 2: _______________________
+
+
+
+
+
+
+
+
+
+
+
+Instructions
+•	You can do this homework in groups of two(**No extra credit for working alone).
+•	The total number of points is 60.
+•	You must answer all questions for full credit.
+•	The due date is as posted on the web page, please submit your answers through Wolfware (One submission per group).  
+
+
+
+
+
+
+
+
+Question 1: [TCP header] [15 points]
+
+(A) The following is a dump of a TCP header in hexadecimal format.
+
+05320017 00000001 00000000 500207FF 00000000
+
+1.	What is the source port number?
+16 bits(binary) of TCP is source port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0532 is the source port number in hexadecimal format which is equal to 0000 0101 0011 0010 in binary format.
+
+
+2. What is the destination port number?
+
+Next 16 bits(binary) of TCP is destination port which is equivalent to 4 bits of TCP header hexadecimal format. So, 0017 is the destination port number in hexadecimal format which is equal to 0000 0000 0001 0111 in binary format.
+
+
+3. What the sequence number?
+Next 32 bits(binary) is sequence number which is 0000 00001  in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0001.
+
+
+4. What is the acknowledgment number?
+Next 32 bits(binary) is acknowledgement number which is 0000 00000 in hexadecimal format. In binary format, sequence number is 0000 0000 0000 0000 0000 0000 0000 0000 0000.
+
+
+5. What is the length of the header?
+Next 4 bits(binary) is header length which is 5 in hexadecimal format. In binary format, length of header 0101.
+
+
+6. What is the type of the segment?
+Skipping next 6 bits, next 6 bits represent type of segment which is 2 in hexadecimal and 000010 in binary format. This indicates SYN flag is set to 1 and hence, this is SYN segment.
+
+7. What is the window size?
+Window size is 07FF in hexadecimal which is equivalent to 0000 0111 1111 1111 in binary format.
+
+
+(B) In a TCP connection, the initial sequence number at client site is 2171. The client opens the connection, sends only one segment carrying 1000 bytes of data, and closes the connection. What is the value of the sequence number in each of the following segments sent by the client?
+
+a. The SYN segment'? 
+2171
+
+
+b. The data segment'? 
+2172
+
+
+c. The FIN segment'?
+3172
+
+
+
+
+
+
+
+(C) Specify three reasons why TCP may not be suitable for real time video streaming. 
+
+1.	Real time video streaming demands high speed data transfer and TCP fails to offer the same. Waiting for packet acknowledgements at the sender’s end and synchronizing the packets according to the sequence number in receiver’s end can lead to a jitter in the video. 
+2.	Loss of a few packets while transmission does not affect real time video streaming. So, reliability measures associated with TCP can act as an overhead in the process. The lost packets may be retransmitted by TCP and the associated congestion control mechanisms may further add to delays in the video streaming.
+3.	Although TCP seems to be in line with the pre-fetching and buffering methodologies that can be adopted to achieve a smooth play-out in video streaming. However, in case of live streaming, little pre-fetching can be done and buffering may result in delays in the video play-out.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Question 2: [TCP throughput] [15 pts]
+
+1.	[3 points] Assume TCP is sending segments using a maximum window size (64 KB) on a channel that has infinite bandwidth and an average roundtrip time of 10 ms. What is the maximum throughput 1? How does the maximum throughput change if the roundtrip time increases to 25 ms?
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(10)
+			= 52428800 bps = 52.4288 Mbps
+
+In case the roundtrip time increases to 25 ms
+
+Maximum throughput 	= Maximum window size (bits)/roundtrip time(seconds)
+			= (64 * 1024 * 8 * 1000)/(25)
+			= 20971520 bps = 20.971 Mbps
+
+
+
+2.	[3 points] Describe the congestion avoidance schemes for the three TCP variants: TCP Tahoe, Reno and Vegas. Also describe at least one performance issue (throughput, fairness,…) for each of them.
+
+
+Tahoe:
+TCP Tahoe: TCP Tahoe depends on packet loss to avoid congestion. Whenever a timeout expires before an ACK is received, loss is detected. The algorithm then reduces congestion window to 1 MSS and starts from the 'slow-start' state.
+
+Issue: Tahoe takes a complete time out interval to detect a packet loss. So, congestion takes longer to detect. Also, as it sends cumulative acknowledgements, therefore whenever there is a packet loss, it waits for the timeout and the pipe is kept empty. So, bandwidth utilization gets lower, which is really not desired. 
+
+Reno:
+TCP Reno: When the sender receives three ACKs acknowledging the same packet, TCP Reno algorithm will half the congestion window to perform 'first transmit' and then enter the first recovery stage. In first recovery, it retransmits the packet and waits for the acknowledgment for the entire window. 
+
+Issue: When packet loss is high, it doesn't perform much better compared to Tahoe. This is because, for successive packet losses, the information for the 2nd packet loss is received once ACK for the first retransmitted packet is received. 
+
+TCP Vegas: To avoid congestion, it focuses on packet delay rather than packet loss unlike the above two algorithms. Vegas pro actively monitors RTT and changes the window linearly to combat congestion.
+
+Issue: The slow start is not very ambitious, so window increases at a lesser rate than TCP Reno.
+
+
+3.	[3 points] Assume a link bandwidth of 10Mbps and a RTT of 10ms, how many bits should the AdvertisedWindow field have in order to keep the pipe full?
+
+Maximum window size (bytes)	= Maximum throughput (Bps) * roundtrip time(seconds)
+				= (10 * 1000000 * 10)/(1000 * 1024)
+				= 97.656 bytes
+
+The binary representation of 12500 has 7 bits (log297.656). Hence, we need 7 bits for the Advertised Window.
+
+
+4. A TCP flow’s throughput can be approximated as
+ ,
+where c is a constant, r is the round trip time, and s is the probability that a segment is lost. Assuming that each segment is split into n fragments, and that the probability of a fragment loss is p, and what is the TCP throughput? Note: A segment is lost if any of its fragments is lost.
+
+1-p is probability that fragment is not lost
+segment loss probability = 1- probability that none of fragments are lost
+                         =1- (1-p)^n       
+throughput = c/r*(1-(1-p)^n)1/2
+
+
+
+Question 3: (Round-Trip Time Estimation) [10 points]
+
+Recall that TCP uses an exponentially weighted moving average to compute round-trip times. Letting Ri be the estimated RTT after i observations, and letting Bi be the ith observation, 
+Ri = ?Ri-1 + (1-?) Bi
+for some constant ??[0,1]. Suppose that our version of TCP measures the RTT once every RTT and uses the (old) formula for the retransmission timer, timeout = 2 * Ri. If the observed round-trip times prior to and including observation j are all 150ms, Rj = 150ms, and subsequent observations are all 500ms, how many additional observations (round-trip times) will it take before the estimate is close enough to the actual RTT (500 ms) to avoid timeouts, when ? = 0.6 and when ? = 0.9? It may be a good idea to write a (very short) program to check your work. For the same parameters as above, write a mathematical expression for the number of observations needed as a function of ?. The more you can simplify it, the better, but strive for correctness first.
+
+
+We can come up with a mathematical expression for the number of observations by comparing the values of RTT for different iterations.
+
+For the sake of convenience, let us denote the current Rj value (i.e. 150) by A and the subsequent observations by B.
+
+Hence,
+	R1 = ? * A + (1 - ?)B
+
+And,
+	R2 = ? * R1 + (1 - ?)B
+Or	R2 = ?[?A + (1 - ?)B] + (1 - ?)B
+	R2 = ?2(A - B) + B
+
+Similarly, calculation of R3 follows
+	R3 = ? * R2 + (1 - ?)B
+Or	R3 = ?[?2(A - B) + B] + (1 - ?)B
+	R3 = ?3(A - B) + B
+
+Hence, for I representing the number of iterations we can use the results obtained for R1, R2 and R3 to get a generalized relation for Ri in terms of A, B and i.
+
+	Ri = ?i(A - B) + B 			(1) 
+
+Or 	i = log?[(Ri - B)/A - B]
+
+For ? = 0.6, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 0.659
+
+Hence only one iteration is required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.6 * 150 + 0.4 * 500	290
+
+For ? = 0.9, setting up Ri = 250 in eq(1) yields
+
+i = log?(250/350) = 3.1973
+Hence 4 iterations (more than 3) are required to make the value of Ri as 250 which in turn sets up the RTT value to 500.
+
+Iteration	Rj (expression)	Rj (Value)
+1	Rj = 0.9 * 150 + 0.1 * 500	185
+2	Rj = 0.9 * 185 + 0.1 * 500	216.5
+3	Rj = 0.9 * 216.5 + 0.1 * 500	244.85
+4	Rj = 0.9 * 244.85 + 0.1 * 500	270.365
+
+
+public class RTT {
+	
+	public static void main(String[] args) {
+	
+	double A = 150, Ri = 0, B = 500, alpha = 0;
+	int j = 0;
+	Scanner sc = new Scanner (System.in);
+	
+	alpha = sc.nextDouble();
+	int counter = 0;
+	while(Ri < 500){
+		Ri = (alpha * A) + ((1-alpha)*B);
+		A = Ri;
+
+		counter++;
+		}
+	
+	System.out.println(“\nNo. of iterations = ” + counter);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 4: (Fast Retransmit and Fast Recovery) [8 points]
+
+In this question, you will be introduced to two notions: fast retransmission and fast recovery. If TCP receives three duplicate ACKS for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In this case, TCP performs a fast retransmit [RFC 2581, 2582], retransmitting the missing segment without waiting for the retransmission timer of this segment to expire. In addition, TCP Reno performs a fast recovery [RFC 2581, 2582] that essentially cancels the slow-start phase after a fast retransmission (remember that slow-start phase occurs after ordinary retransmissions). Both fast retransmission and fast recovery have the potential of improving TCP performance. 
+
+Is Fast Retransmit and Fast recovery more suitable when there are isolated packet losses OR when there are loss bursts (a sequence of consecutive packet losses)?  Make a strong case for your answer through examples.
+
+Fast retransmit and recovery are more suitable for isolated packet losses. Upon packet loss, receiver sends duplicate acknowledgment
+
+Fast retransmit and recovery are effective for isolated packet losses.
+Fast retransmit and fast recovery is used for recovery from isolated packet losses. When a packet is lost,TCP receiver sends duplicate acknowledgments upon the receipt of subsequent packets (These packets are not in order since there is a missing packet). When the sender receives the 3rd ACK it set the threashold (ssthresh) to half the Cwin (congestion window) and retransmits the missing packet using the ACK number. Then the sender reduces halves the value of Cwin and adds three (for 3 ACKs). Now for every additional ACK it receives, source sends an additional packet (if allowed by maximum window) and increases the value of Cwin by 1. When the receiver sends the new ACK for the missing segment, sender sets the value
+of Cwin to threshold (ssthresh). Now since the value of Cwin and ssthresh are equal, source enters
+congestion avoidance mode. Hence, Fast retransmit and fast recovery improve the TCP performance while
+an isolated packet is lost.
+However in high bandwidth links, network congestions cause many packets (loss bursts) to be dropped. In
+this fast retransmit and recovery are not able to recover from the loss and slow start is triggered. Sender
+goes to the congestion avoidance mode when there is no congestion in the network. Therefore, Fast
+retransmit and recovery are effective for isolated packet losses and not loss bursts.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+Question 5: (Congestion Control and Throughput) [12 points]
+You are observing a protocol that uses additive-increase, multiplicative-decrease congestion windows for congestion control as in TCP. This protocol transmits fixed-length packets of size S = 10KB from the sender to receiver across an unreliable network. The receiver sends an ACK whenever a packet is successfully received, and sends a negative acknowledgment (NAK) whenever an expected packet is not received. Although the sender’s packets are lost in this network, acknowledgments are never lost; moreover, the sender receives either an ACK or a NAK exactly 1 second after it transmits a packet. The sender’s congestion window (Cwin) is initialized to S =10KB, and increase it by 1KB each time it receives a positive acknowledgment. The sender halves Cwin when the first (of a sequence) of NAKs arrives, but does not decrease it further when subsequent NAKs in the sequence arrive. Letting U denote the total number of unacknowledged bytes in transit, the sender transmits a new packet whenever Cwin – U > S. Finally, a transmission is lost if Cwin exceeds W bytes at the time of transmission.
+
+a)	What range of values does Cwin vary between in steady-state (be careful)? 
+
+The maximum window size is achieved when the length of Cwin is equal to W. At this moment the sender will send W/S packets which will be successfully acknowledged by the receiver. On receipt of the acknowledgements the size of Cwin will increase by 1 * W/S KB (1 KB for each of the W/S acknowledgements).
+
+Hence, the max window size for Cwin = W + W/S = 11W/10 (since S = 10)
+
+At this point, each packet sent by the sender will fail and generate a negative acknowledgement. Hence, on receipt of a negative acknowledgement, Cwin will drop by 50% leading to a new window size of 11W/20.
+
+Now, since Cwin < W, the packets sent to the receiver will get delivered and generate positive acknowledgements. The value of Cwin will again increase by 1 KB till it reaches W and the cycle repeats in steady-state.
+
+Hence the maximum and minimum window size for Cwin is 11W/10 and 11W/20 respectively.
+
+
+b) How many packets are transmitted and acknowledged successfully between NAK periods?
+
+As shown above the minimum value of Cwin is 11W/20 which is achieved when a negative acknowledgement is received at Cwin size of 11W/10. It does not decrease any further as we ignore the subsequent negative acknowledgements for the sequence. At this point the window size increases again to the maximum value of 11W/10.
+
+Hence, we can calculate the number of packets transmitted by the difference of the maximum and minimum window sizes, i.e. 11W/20 KB.
+
+Since, the window size increases by 1 KB for each packet, the change of 11W/20 KB can be achieved by the successful transmission of 11W/20 packets.
+
+Therefore, 11W/20 packets are transmitted and acknowledged successfully between NAK periods.
+
+ 
+
+import static java.net.InetAddress.getByName;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+
+public class Client {
+	private String server;
+	private int port;
+	private String filename;
+	private int windowsSize;
+	private int mss;
+	private volatile int numberOfSentPackets = 0;
+	private volatile Segment[] buffer;
+	private DatagramSocket clientSocket;
+	private volatile int dataAck;
+	volatile long totalPackets;
+	int sizeOfLastPacket;
+
+	final int RTTTimer = 1500; // milliseconds
+
+	public Client(String server, int port, String filename, int windowsSize, int mss) {
+		this.server = server;
+		this.port = port;
+		this.filename = filename;
+		this.windowsSize = windowsSize;
+		this.mss = mss;
+		this.totalPackets = -1;
+		this.sizeOfLastPacket = -1;
+
+		// Go-back-N: need buffer
+		buffer = new Segment[windowsSize];
+
+		dataAck = -1;
+
+		try {
+			clientSocket = new DatagramSocket(0);
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			clientSocket.connect(getByName(server), port);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public static void main(String[] args) {
+
+		if (args == null || args.length != 5) {
+			System.out.println("Invalid input");
+			return;
+		}
+
+		String server_host = args[0];
+		int port = Integer.parseInt(args[1]); // 7735;
+		String fileName = args[2];
+		int windowSize = Integer.parseInt(args[3]);// 64;
+		int mss = Integer.parseInt(args[4]);// 200; // bytes
+
+		for (windowSize = 2; windowSize <= 1000; windowSize *= 2) {
+			for (int i = 0; i < 2; ++i) {
+				// System.out.println("MSS = " + windowSize);
+				long startTime = System.currentTimeMillis();
+
+				new Client(server_host, port, fileName, windowSize, mss).run();
+
+				File file = new File(fileName);
+
+				long fileSize = file.length();
+
+				long endTime = System.currentTimeMillis();
+
+
+				System.out.println((i + 1) + ". MSS = " + mss + "\tDelay = " +
+						(endTime - startTime) + "\tBytes Transferred = " + fileSize);
+				//System.out
+				//.println("Probability = 0.01\tDelay = " + (endTime - startTime) + "\tBytes Transferred = " + fileSize);
+			}
+		}
+
+		// new Client(server_host, port, fileName, windowSize, mss).run();
+	}
+
+	public void run() {
+		File file = new File(filename);
+		byte data[] = new byte[mss];
+		try {
+			if (file.exists()) {
+				long fileSize = file.length();
+
+				totalPackets = (long) Math.ceil((double) fileSize / this.mss);
+				sizeOfLastPacket = (int) fileSize % this.mss;
+
+				/*
+				 * System.out.println("Total packets = " + totalPackets +
+				 * ", size of last packet = " + sizeOfLastPacket);
+				 */
+
+				FileInputStream fis = new FileInputStream(file);
+
+				// Starting the acknowledgment listener
+				AcknowledgmentServer ackServer = new AcknowledgmentServer(this.clientSocket);
+				ackServer.start();
+				while (numberOfSentPackets < totalPackets) {
+					int index = numberOfSentPackets % windowsSize;
+
+					/*if (buffer[index] == null
+							|| (buffer[index] != null && buffer[index].packet.sequenceNumber <= dataAck)) {
+						// send the packet
+						if (fis.read(data) > -1)
+							rdtSend(data, index);
+					}*/
+
+					Segment obj = operateBuffer(index, null);
+
+					if (obj == null || (obj != null && obj.ackReceived == true && obj.packet.sequenceNumber != -1)) {
+						// send the packet
+						if (fis.read(data) > -1)
+							if(!rdtSend(data, index)){
+								continue;
+							}
+					}
+
+					/*
+					 * if ((numberOfSentPackets <= dataAck) || (dataAck == -1 &&
+					 * numberOfSentPackets < windowsSize)) { if(fis.read(data) >
+					 * -1) rdtSend(data, index); }
+					 */
+				}
+
+				// Send another packet with FTPPacket as null
+				sendTermintingPacket();
+
+				fis.close();
+			}
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+
+	private void sendTermintingPacket() throws IOException {
+		while (dataAck != totalPackets - 1) {
+			// System.out.println("[TERMINATION]: dataAck = " + dataAck +
+			// ", numberOfSentPackets" + numberOfSentPackets);
+		}
+
+		// System.out.println("Sending terminating packet");
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream outStream = new ObjectOutputStream(bos);
+		outStream.writeObject(null);
+		byte[] sendData = bos.toByteArray();
+		DatagramPacket dataPacket = new DatagramPacket(sendData, sendData.length, getByName(server), port);
+		clientSocket.send(dataPacket);
+	}
+
+	public synchronized Segment operateBuffer(int index, Segment object){
+
+		/*if(index >= buffer.length)
+			return new Segment(new FTPPacket(-1, (short)0, (short)0));
+		 */
+		if(object != null && object.ackReceived == false && (buffer[index] == null || buffer[index].ackReceived)){
+			buffer[index] = object;	
+			return buffer[index];
+		}
+		else if(object != null && object.ackReceived == false && buffer[index] != null && buffer[index].packet.sequenceNumber == object.packet.sequenceNumber) {
+			buffer[index] = object;	
+			return buffer[index];
+		}
+		else if(object == null) {
+			return buffer[index];
+		}
+		return null;
+
+	}
+
+
+	private boolean rdtSend(byte[] data, int index) throws IOException {
+		// TODO Auto-generated method stub
+		boolean isLast = false;
+		FTPPacket packet = null;
+
+		if (numberOfSentPackets == totalPackets - 1) {
+			// This is the last packet
+			byte[] lastPacket = new byte[sizeOfLastPacket];
+
+			for (int i = 0; i < lastPacket.length; ++i) {
+				lastPacket[i] = data[i];
+			}
+
+			packet = new FTPPacket(numberOfSentPackets, (short) 0, (short) 21845, lastPacket);
+
+			isLast = true;
+		}
+
+		// Packet to be sent
+		if (!isLast) {
+			packet = new FTPPacket(numberOfSentPackets, (short) 0, (short) 21845, data);
+		}
+
+		short checksum = generateChecksum(serialize(packet));
+
+		// System.out.println("Checksum = " + checksum);
+
+		packet.checksum = checksum;
+
+		// Go-Back protocol: store packet in buffer
+		Segment newSeg = new Segment(packet);
+
+
+		//buffer[numberOfSentPackets % windowsSize] = new Segment(packet);
+
+		Segment seg = operateBuffer(index, newSeg);
+		if(seg == null) {
+			//Roll back
+			return false;
+		}
+
+		// Send Packet to server
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream outStream = new ObjectOutputStream(bos);
+		outStream.writeObject(packet);
+		byte[] sendData = bos.toByteArray();
+		DatagramPacket dataPacket = new DatagramPacket(sendData, sendData.length, getByName(server), port);
+		clientSocket.send(dataPacket);
+
+		// System.out.println("Kuch bhi = " +
+		// generateChecksum(serialize(packet)));
+
+
+		newSeg.setSentTime();
+
+		// Add the packet to the buffer
+		numberOfSentPackets++;
+
+		new RetransmitHandler(index, newSeg.packet.sequenceNumber).start();
+		return true;
+		// buffer[index].timer.schedule(new RetransmitHandler(index,
+		// this.clientSocket), RTTTimer);
+	}
+
+	public static byte[] serialize(Object obj) throws IOException {
+		try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
+			try (ObjectOutputStream o = new ObjectOutputStream(b)) {
+				o.writeObject(obj);
+			}
+			return b.toByteArray();
+		}
+	}
+
+	public short generateChecksum(byte[] packet) {
+		int checksum = 0;
+		for (int i = 0; i < packet.length; i += 2) {
+			int leftByte = (packet[i] << 8) & 0xFF00;
+			int rightByte = (i + 1) < packet.length ? (packet[i + 1] & 0x00FF) : 0;
+			checksum += (leftByte + rightByte);
+			String hex = Integer.toHexString(checksum);
+			if (hex.length() > 4) {
+				int carry = Integer.parseInt(String.valueOf(hex.charAt(0)), 16);
+				checksum = (Integer.parseInt(hex.substring(1, 5), 16) + carry);
+			}
+		}
+		// Complement the checksum value
+		return (short) (Integer.parseInt("FFFF", 16) - checksum);
+	}
+
+	private class AcknowledgmentServer extends Thread {
+		private DatagramSocket socket;
+
+		public AcknowledgmentServer(DatagramSocket socket) {
+			this.socket = socket;
+		}
+
+		public void run() {
+			byte databuffer[] = new byte[1024];
+			int length = databuffer.length;
+			DatagramPacket datagrampacket = new DatagramPacket(databuffer, length);
+			if (!socket.isClosed()) {
+				try {
+					boolean send = true;
+					while (send) {
+						socket.receive(datagrampacket);
+						ObjectInputStream outputStream = new ObjectInputStream(
+								new ByteArrayInputStream(datagrampacket.getData()));
+						FTPPacket packet = (FTPPacket) outputStream.readObject();
+						synchronized(packet){
+							if (packet.ackFlag == (short) 43690) {
+								//dataAck = packet.sequenceNumber;
+
+								if(dataAck < packet.sequenceNumber){
+									dataAck = packet.sequenceNumber;
+								}
+
+								Segment obj = operateBuffer(packet.sequenceNumber % windowsSize, null);
+
+								if(obj.packet.sequenceNumber == packet.sequenceNumber){
+									obj.ackReceived = true;
+									//operateBuffer(packet.sequenceNumber % windowsSize, obj);
+								}
+							}
+						}
+						if (dataAck == (totalPackets - 1)) {
+							send = false;
+						}
+					}
+				} catch (Exception e) {
+					System.out.println("Error occured..." + e.getMessage());
+				}
+			}
+		}
+	}
+
+	private class RetransmitHandler extends Thread {
+		int packetIndex;
+		int sequenceNumber;
+
+		public RetransmitHandler(int packetIndex, int sequenceNumber) {
+			this.sequenceNumber = sequenceNumber;
+			this.packetIndex = packetIndex;
+		}
+
+		public void run() {
+
+			boolean cancelTimer = false;
+			synchronized(this){
+				while (!cancelTimer) {
+
+					Segment obj = operateBuffer(packetIndex, null);
+
+					long sentTimestamp = obj.sentTimestamp;
+
+					while ((System.currentTimeMillis() - sentTimestamp) < RTTTimer) {
+
+					}
+
+					obj = operateBuffer(packetIndex, null);
+
+					if(obj.packet.sequenceNumber != this.sequenceNumber){
+						//					System.out.println("[RET]: Dropping packet");
+						break;
+					}
+
+					if (obj.packet != null && obj.ackReceived == true) {
+						/*
+						 * System.out.println("Timer cancelled for seq. no. " +
+						 * buffer[packetIndex].packet.sequenceNumber);
+						 */
+						cancelTimer = true;
+					} else {
+						/*
+						 * System.out.println("Timeout, sequence number = " +
+						 * buffer[packetIndex].packet.sequenceNumber +
+						 * ", dataAck = " + dataAck);
+						 */
+						// retransmit the packet
+						FTPPacket packet = new FTPPacket(obj.packet.sequenceNumber, (short) 0,
+								(short) 21845, obj.packet.data);
+
+						short checksum = 0;
+						try {
+							checksum = generateChecksum(serialize(packet));
+						} catch (IOException e3) {
+							// TODO Auto-generated catch block
+							e3.printStackTrace();
+						}
+
+						packet.checksum = checksum;
+
+
+						Segment retransmittedSeg = new Segment(packet);
+
+						//buffer[packetIndex] = new Segment(packet);
+
+						// Send Packet to server
+						ByteArrayOutputStream bos = new ByteArrayOutputStream();
+						ObjectOutputStream outStream = null;
+						try {
+							outStream = new ObjectOutputStream(bos);
+						} catch (IOException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+						try {
+							outStream.writeObject(packet);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						byte[] sendData = bos.toByteArray();
+						DatagramPacket dataPacket = null;
+
+						try {
+							dataPacket = new DatagramPacket(sendData, sendData.length, getByName(server), port);
+						} catch (UnknownHostException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+						try {
+							clientSocket.send(dataPacket);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						// Initiate the timer again
+						retransmittedSeg.setSentTime();
+						//buffer[packetIndex].setSentTime();
+						operateBuffer(packetIndex, retransmittedSeg);
+					}
+
+				}
+			}
+		}
+	}
+}
